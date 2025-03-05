@@ -4,9 +4,20 @@
  Stewart Wilson, March 2025.
 
  nb. to run tests...
- npm test __tests__/seed.test.js 
+ npm run test-seed 
 
- TODO: all tests pass but not every simgle time? it seemed sketchy for a while but seems ok now.
+ TODO: all seeding tests *will* pass but not on every run? it seems a bit sketchy...
+
+ -error: insert or update on table "articles" violates foreign key constraint "articles_author_fkey"
+ -error: insert or update on table "comments" violates foreign key constraint "comments_author_fkey"
+
+ nb. on the seeding functions (seedTable_Articles, seedTable_Comments) I used "new Date()" to fix some 
+ earlier problems where it was complaining about the TIMESTAMP seed values, but the tables do actually 
+ use TIMESTAMP's so what's going on with that?
+
+ Answer: The seeding data TIMESTAMP'S provided are in UNIX format, Postgresql uses it's own type, so
+ passing these values into new Date() converts them.
+ 
 */
 
 const db = require("../connection")
@@ -63,7 +74,7 @@ function createTable_Articles() {
     topic VARCHAR(255) REFERENCES topics(slug),
     author VARCHAR(255) REFERENCES users(username),
     body TEXT,
-    created_at TIMESTAMP,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     votes INT DEFAULT 0,
     article_img_url VARCHAR(1000));`);
 }
@@ -79,7 +90,7 @@ function createTable_Comments() {
     body TEXT,
     votes INT DEFAULT 0,
     author VARCHAR(255) REFERENCES users(username),
-    created_at TIMESTAMP);`);
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP);`);
 }
 
 
